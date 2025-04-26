@@ -1,8 +1,8 @@
 
  class RegisterUserController { 
    static RegisterUser(req,res) {
-    const  {username,email} = req.body;
-    if(!username || !email ) {
+    const  {nome,email} = req.body;
+    if(!nome || !email ) {
         res.json({Message: "Por favor, insira todos os dados!"});
     }
     else {

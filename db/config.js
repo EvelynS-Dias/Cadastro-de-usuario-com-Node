@@ -1,30 +1,59 @@
 import { Session } from "inspector/promises";
 import { DatabaseSync } from "node:sqlite";
+import express from "express";
 import sqlite3 from "sqlite3";
 
-const userDB = new DatabaseSync(':memory:') 
+const userDB = new sqlite3.Database(':memory:'); 
+
 
 //CRIAR UMA NOVA TABELA
-export default function createTable() { 
-userDB().then(db => db.exec('CREATE TABLE user(id INTEGER PRIMARY KEY, nome TEXT, email TEXT) STRICT', (err) =>
-    {  if(err) {
-    return console.log("Houve um erro na criação do banco de dados!");
+  export async function createTable()  {
+
+    const query  = `CREATE TABLE
+    user(id INTEGER PRIMARY KEY,
+     nome TEXT NOT NULL ,
+      email TEXT NOT NULL UNIQUE)STRICT`
+
+    
+      return new Promise((resolve, reject) => {
+        userDB.run(query, function (err) {
+          if (err) {
+            console.log("Houve um erro na criação do banco de dados!");
+            reject(err);  // Rejeita a Promise em caso de erro
+          } else {
+            console.log("Tabela criada com sucesso!");
+            resolve();  // Resolve a Promise se tudo ocorrer bem
+          }
+        });
+      });
+    }
+           
+
+
+ export async function insertUser(req,res,next) {  
+    try  { 
+  const  { nome, email } = req.body;
+  
+  userDB.serialize(() =>  {
+  const check = userDB.prepare('SELECT email FROM user where email = ?').get(email.toLowerCase());
+
+  if(check) {
+   return res.status(400).json("Esse email já está cadastrado! Por favor registre outro.")
+  }
+  
+const novoUser = userDB.prepare('INSERT INTO user (nome,email) VALUES(?,?)') 
+novoUser.run(nome,email.toLowerCase(), (err)=> {;
+res.status(200).json("Usuário criado com sucesso!")
+  }  
+
+     ) 
+    })}
+    catch(err) {
+        res.status(500).json("Houve uma falha na inserção de dados: ")
+        reject("Erro na inserção do usuário: " + err); 
+
      }
-    else {
-    return console.log("Tabela criada com sucesso!")
-    } }))
-}
 
-//CRIANDO UMA SESSÃO, UM LOG QUE VAI FICAR ARMAZENANDO TUDO QUE ESTIVER ACONTECENDO
-const session = userDB.createSession();
+    }
 
-//INSERIR NOVO USUÁRIO 
-export default function insertUser(pessoa) {   
-const novoUser = userDB.prepare('INSERT INTO user(nome,email) VALUE(?,?)');
-novoUser.run(pessoa);
-}
-
-
-const changeset = session.changeset();
-userDB.applyChangeset(changeset)
 
