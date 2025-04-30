@@ -20,7 +20,7 @@ try {
     }
     
 } catch(err) {
-    console.log("Falha! " + err)
+    console.log("Houve um erro inesperado no banco de dados: " + err)
 }
 
 try { 
@@ -29,7 +29,7 @@ try {
     res.status(200).json({Message: "Usuário inserido com sucesso!"})
 }
 catch(err) {
-    console.log("Novo erro! "+ err);
+    console.log("Aconteceu um erro na inserção do usuário no banco de dados: "+ err);
 }
 
 }
