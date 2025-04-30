@@ -5,26 +5,30 @@ import { open } from "sqlite"; //Abre o arquivo no sistema
 import fs from "fs";
 import UserService from "./services/user.service.js"
 
-let db 
+export let db;
 
 async function initDb() { 
-    db = await open ({
+ 
+     db = await open ({
       filename: "./db/banco.db", //Abre o arquivo com o caminho
       driver: sqlite3.Database, //Qual o driver que vamos usar para ler, escrever, deçetar
-    });
-  } 
+    }) 
+    console.log("Banco de dados inicializado!")
+};
+
   
    function getDB() { // função para expor o banco de dado s para nossa aplicação
   if(!db) {
-    logEvents("Banco de dados não foi inicializado", "data_base.log") // registrar os erros
+   // logEvents("Banco de dados não foi inicializado", "data_base.log") // registrar os erros
+   console.log("Banco de dados não foi inicializado")
   }
-  return db 
+  return db
   }
   
     async function createTable() { 
   
     await db.exec(`CREATE TABLE IF NOT EXISTS 
-          user(id TEXT PRIMARY KEY,
+          user(id TEXT PRIMARY KEY NOT NULL ,
            nome TEXT NOT NULL ,
             email TEXT NOT NULL UNIQUE) STRICT`) 
   
