@@ -1,7 +1,10 @@
 import express from "express";
 import router from "./routes/cadastro.route.js"
-import {createTable}  from "./db/config.js"
+import UserService from "./services/user.service.js"
+import { initDb, createTable } from "./database.js";
 
+await initDb(); // Começar a rodar primeiro o banco pra depois inicializar o servidor.
+await createTable();
 
 const app = express(); 
 const PORT = 3000;
@@ -11,7 +14,6 @@ app.use("/", router );
 
 async function servidor (){ 
 
-await createTable()
 app.listen(PORT, () => { 
 console.log(`Servidor rodando na porta ${PORT}`) }
 );
